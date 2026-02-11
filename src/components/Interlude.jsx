@@ -52,10 +52,10 @@ const Interlude = () => {
         y: 0,
         x: 0,
         rotation: 0,
-        duration: 1,
+        duration: 0.8,
         ease: "power3.out",
         stagger: {
-          amount: 0.5,
+          amount: 0.4,
           from: "random"
         }
       }

@@ -1,4 +1,5 @@
-/* 1. Khai báo Tailwind */
+/* 1. Imports (phải đặt trên cùng) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
 @import "tailwindcss";
 
 /* 2. Cấu hình Font & Biến */
@@ -6,7 +7,6 @@
   --font-inter: "Inter", system-ui, -apple-system, sans-serif;
   --font-mono-code: "JetBrains Mono", monospace;
 }
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
 
 /* 3. Global Styles */
 body {
@@ -394,7 +394,14 @@ body {
 }
 @media (min-width: 768px) { .interlude-text-base { font-size: 9vw; } }
 
-.interlude-dot { padding-left: 0; padding-right: 4vw; }
+.interlude-dot {
+  padding-left: 0;
+  padding-right: 4vw;
+  display: inline-block;
+  line-height: 0.8;
+  transform: scaleY(1.45);
+  transform-origin: center;
+}
 
 
 /* --- CONTACT SECTION STYLES (Mobile Optimized) --- */
@@ -529,12 +536,12 @@ html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-scrolling iframe { pointer-events: none; }
 
 .loader-matrix {
-  width: 45px; height: 40px;
+  width: 58px; height: 52px;
   background: 
     linear-gradient(#0000 calc(1*100%/6), #fff 0 calc(3*100%/6), #0000 0),
     linear-gradient(#0000 calc(2*100%/6), #fff 0 calc(4*100%/6), #0000 0),
     linear-gradient(#0000 calc(3*100%/6), #fff 0 calc(5*100%/6), #0000 0);
-  background-size: 10px 400%; background-repeat: no-repeat;
+  background-size: 12px 400%; background-repeat: no-repeat;
   animation: matrix-anim 1s infinite linear;
 }
 @keyframes matrix-anim {

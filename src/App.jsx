@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/all';
 import Lenis from 'lenis';
@@ -22,15 +22,19 @@ gsap.registerPlugin(ScrollTrigger);
 const App = () => {
   // State để kiểm soát trạng thái loading
   const [isLoading, setIsLoading] = useState(true);
+  const handleLoadingComplete = useCallback(() => {
+    setIsLoading(false);
+  }, []);
 
   useEffect(() => {
     // Chỉ khởi tạo Lenis sau khi đã load xong để tránh xung đột scroll
     if (isLoading) {
-        document.body.style.overflow = 'hidden'; // Khóa scroll khi đang load
-        return;
-    } else {
-        document.body.style.overflow = ''; // Mở khóa scroll
+      document.body.style.overflow = 'hidden'; // Khóa scroll khi đang load
+      return () => {
+        document.body.style.overflow = '';
+      };
     }
+    document.body.style.overflow = ''; // Mở khóa scroll
 
     // --- CẤU HÌNH SMOOTH SCROLL (LENIS) ---
     const lenis = new Lenis({
@@ -46,15 +50,18 @@ const App = () => {
 
     lenis.on('scroll', ScrollTrigger.update);
 
-    gsap.ticker.add((time) => {
+    const tick = (time) => {
       lenis.raf(time * 1000);
-    });
+    };
+    gsap.ticker.add(tick);
 
     gsap.ticker.lagSmoothing(0);
 
     return () => {
-      gsap.ticker.remove((time) => lenis.raf(time * 1000));
+      lenis.off('scroll', ScrollTrigger.update);
+      gsap.ticker.remove(tick);
       lenis.destroy();
+      document.body.style.overflow = '';
     };
   }, [isLoading]);
 
@@ -66,7 +73,7 @@ const App = () => {
 
       {/* Hiển thị Loading Screen nếu đang load */}
       {isLoading && (
-        <LoadingScreen onLoadingComplete={() => setIsLoading(false)} />
+        <LoadingScreen onLoadingComplete={handleLoadingComplete} />
       )}
 
       {/* Nội dung chính */}

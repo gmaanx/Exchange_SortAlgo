@@ -1,19 +1,62 @@
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// --- 1. COMPONENT CodeCard (GIỮ NGUYÊN Y CHANG) ---
+const CODE_STRING = `void ExchangeSort(int[] arr) {
+    int n = arr.Length;
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = i + 1; j < n; j++) {
+            if (arr[j] < arr[i]) {
+                int temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+            }
+        }
+    }
+}`;
+
+const FLOW = {
+  X_C1: 100, X_C2: 220, X_C3: 340, X_C4: 460,
+  Y_START: 30, Y_IN_ARR: 70, Y_IN_N: 110, Y_I0: 150,
+  Y_CHECK_I: 200, Y_J_INIT: 225, Y_CHECK_J: 275, Y_COMPARE: 345,
+  Y_SWAP1: 345, Y_SWAP2: 385, Y_SWAP3: 425, Y_MERGE_SWAP: 465,
+  Y_J_INC: 495, Y_I_INC: 555, Y_END: 605,
+};
+
+const HIGHLIGHT_RULES = [
+  { pattern: /\bvoid\b/g, token: 'text-purple-400' },
+  { pattern: /\bif\b/g, token: 'text-purple-400' },
+  { pattern: /\bfor\b/g, token: 'text-purple-400' },
+  { pattern: /\bwhile\b/g, token: 'text-purple-400' },
+  { pattern: /\bint\b/g, token: 'text-blue-400' },
+  { pattern: /\bdouble\b/g, token: 'text-blue-400' },
+  { pattern: /\bbool\b/g, token: 'text-blue-400' },
+  { pattern: /\btrue\b/g, token: 'text-blue-300' },
+  { pattern: /\bfalse\b/g, token: 'text-blue-300' },
+  { pattern: /1\.3/g, token: 'text-orange-400' },
+  { pattern: /\bSwap\b/g, token: 'text-yellow-300' },
+];
+
+// --- 1. COMPONENT CodeCard ---
 const CodeCard = ({ code }) => {
   const [copied, setCopied] = useState(false);
 
-  const handleCopy = () => {
+  const highlightedCode = useMemo(() => {
+    return HIGHLIGHT_RULES.reduce(
+      (result, { pattern, token }) => result.replace(pattern, `<span class="${token}">$&</span>`),
+      code
+    );
+  }, [code]);
+
+  const handleCopy = useCallback(() => {
+    if (!navigator?.clipboard) return;
     navigator.clipboard.writeText(code);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-  };
+  }, [code]);
 
   return (
     <div className="relative group rounded-lg overflow-hidden border border-white/10 bg-[#0F1115] hover:border-white/30 transition-all duration-500 shadow-2xl mt-4 w-full">
@@ -38,20 +81,7 @@ const CodeCard = ({ code }) => {
 
       <div className="p-4 md:p-6 text-[10px] md:text-xs font-mono-code leading-relaxed overflow-x-auto custom-scrollbar">
         <pre style={{ margin: 0 }}>
-          <code dangerouslySetInnerHTML={{ 
-            __html: code
-              .replace(/void/g, '<span class="text-purple-400">void</span>')
-              .replace(/int/g, '<span class="text-blue-400">int</span>')
-              .replace(/double/g, '<span class="text-blue-400">double</span>')
-              .replace(/bool/g, '<span class="text-blue-400">bool</span>')
-              .replace(/if/g, '<span class="text-purple-400">if</span>')
-              .replace(/for/g, '<span class="text-purple-400">for</span>')
-              .replace(/while/g, '<span class="text-purple-400">while</span>')
-              .replace(/true/g, '<span class="text-blue-300">true</span>')
-              .replace(/false/g, '<span class="text-blue-300">false</span>')
-              .replace(/1.3/g, '<span class="text-orange-400">1.3</span>')
-              .replace(/Swap/g, '<span class="text-yellow-300">Swap</span>')
-          }} />
+          <code dangerouslySetInnerHTML={{ __html: highlightedCode }} />
         </pre>
       </div>
     </div>
@@ -63,25 +93,6 @@ const CodeSection = () => {
   const containerRef = useRef(null);
   const flowRef = useRef(null);
   const codeRef = useRef(null);
-
-  const X_C1 = 100; const X_C2 = 220; const X_C3 = 340; const X_C4 = 460;
-  const Y_START = 30; const Y_IN_ARR = 70; const Y_IN_N = 110; const Y_I0 = 150; 
-  const Y_CHECK_I = 200; const Y_J_INIT = 225; const Y_CHECK_J = 275; const Y_COMPARE = 345; 
-  const Y_SWAP1 = 345; const Y_SWAP2 = 385; const Y_SWAP3 = 425; const Y_MERGE_SWAP = 465; 
-  const Y_J_INC = 495; const Y_I_INC = 555; const Y_END = 605;
-
-  const codeString = `void ExchangeSort(int[] arr) {
-    int n = arr.Length;
-    for (int i = 0; i < n - 1; i++) {
-        for (int j = i + 1; j < n; j++) {
-            if (arr[j] < arr[i]) {
-                int temp = arr[i];
-                arr[i] = arr[j];
-                arr[j] = temp;
-            }
-        }
-    }
-}`;
 
   useGSAP(() => {
     const tl = gsap.timeline({
@@ -95,17 +106,17 @@ const CodeSection = () => {
       }
     });
 
-    // HIỆU ỨNG WIPE IN: Chữ trồi lên nhanh và dứt khoát
+    // HIỆU ỨNG TITLE: mềm hơn, ít gắt hơn bản cũ
     tl.from(".wipe-line h1", {
-      yPercent: 100,
-      opacity: 0,
-      stagger: 0.1,
-      duration: 0.6,    
-      ease: "power2.out"
+      y: 72,
+      autoAlpha: 0,
+      stagger: 0.14,
+      duration: 1.28,
+      ease: "power3.out"
     })
     // Flow và Code bay vào GẦN NHƯ SONG SONG với tiêu đề
-    .fromTo(flowRef.current, { y: "110vh" }, { y: "-120vh", ease: "none", duration: 10 }, "-=0.7")
-    .fromTo(codeRef.current, { y: "110vh" }, { y: "0%", ease: "power1.out", duration: 10 }, "-=8.5");
+    .fromTo(flowRef.current, { y: "110vh" }, { y: "-120vh", ease: "none", duration: 10 }, "-=0.25")
+    .fromTo(codeRef.current, { y: "110vh" }, { y: "0%", ease: "power1.out", duration: 10 }, "-=8.8");
   }, { scope: containerRef });
 
   const nodeClass = "flow-node border-2 border-white bg-black text-white transition-all duration-300 hover:bg-white hover:text-black z-10 flex items-center justify-center cursor-default";
@@ -134,57 +145,57 @@ const CodeSection = () => {
                         <svg className="absolute inset-0 w-full h-full pointer-events-none z-0 overflow-visible" viewBox="0 0 550 650">
                             <defs><marker id="arrow" markerWidth="4" markerHeight="4" refX="2" refY="2" orient="auto"><path d="M0,0 L4,2 L0,4 z" fill="white" /></marker></defs>
                             <g stroke="white" strokeWidth="1.5" fill="none">
-                                <line x1={X_C1} y1={Y_START+15} x2={X_C1} y2={Y_IN_ARR-12} markerEnd="url(#arrow)" />
-                                <line x1={X_C1} y1={Y_IN_ARR+12} x2={X_C1} y2={Y_IN_N-12} markerEnd="url(#arrow)" />
-                                <line x1={X_C1} y1={Y_IN_N+12} x2={X_C1} y2={Y_I0-12} markerEnd="url(#arrow)" />
-                                <line x1={X_C1} y1={Y_I0+12} x2={X_C1} y2={Y_CHECK_I-20} markerEnd="url(#arrow)" />
-                                <polyline points={`${X_C1-20},${Y_CHECK_I} ${X_C1-60},${Y_CHECK_I} ${X_C1-60},${Y_END} ${X_C1-30},${Y_END}`} markerEnd="url(#arrow)" />
-                                <polyline points={`${X_C1+20},${Y_CHECK_I} ${X_C2},${Y_CHECK_I} ${X_C2},${Y_J_INIT-12}`} markerEnd="url(#arrow)" />
-                                <line x1={X_C2} y1={Y_J_INIT+12} x2={X_C2} y2={Y_CHECK_J-20} markerEnd="url(#arrow)" />
-                                <polyline points={`${X_C2-20},${Y_CHECK_J} ${X_C1},${Y_CHECK_J} ${X_C1},${Y_I_INC-12}`} markerEnd="url(#arrow)" />
-                                <polyline points={`${X_C2+20},${Y_CHECK_J} ${X_C3},${Y_CHECK_J} ${X_C3},${Y_COMPARE-20}`} markerEnd="url(#arrow)" />
-                                <line x1={X_C3} y1={Y_COMPARE+20} x2={X_C3} y2={Y_MERGE_SWAP} stroke="white" />
-                                <polyline points={`${X_C3+20},${Y_COMPARE} ${X_C4},${Y_COMPARE} ${X_C4},${Y_SWAP1-12}`} markerEnd="url(#arrow)" />
-                                <line x1={X_C4} y1={Y_SWAP1+12} x2={X_C4} y2={Y_SWAP2-12} markerEnd="url(#arrow)" />
-                                <line x1={X_C4} y1={Y_SWAP2+12} x2={X_C4} y2={Y_SWAP3-12} markerEnd="url(#arrow)" />
-                                <polyline points={`${X_C4},${Y_SWAP3+12} ${X_C4},${Y_MERGE_SWAP} ${X_C2},${Y_MERGE_SWAP}`} />
-                                <line x1={X_C2} y1={Y_MERGE_SWAP} x2={X_C2} y2={Y_J_INC-12} markerEnd="url(#arrow)" />
-                                <polyline points={`${X_C2},${Y_J_INC+12} ${X_C2},${Y_J_INC+30} ${X_C1},${Y_J_INC+30} ${X_C1},${Y_I_INC-12}`} markerEnd="url(#arrow)" />
-                                <line x1={X_C1} y1={Y_I_INC+12} x2={X_C1} y2={Y_END-15} markerEnd="url(#arrow)" />
+                                <line x1={FLOW.X_C1} y1={FLOW.Y_START+15} x2={FLOW.X_C1} y2={FLOW.Y_IN_ARR-12} markerEnd="url(#arrow)" />
+                                <line x1={FLOW.X_C1} y1={FLOW.Y_IN_ARR+12} x2={FLOW.X_C1} y2={FLOW.Y_IN_N-12} markerEnd="url(#arrow)" />
+                                <line x1={FLOW.X_C1} y1={FLOW.Y_IN_N+12} x2={FLOW.X_C1} y2={FLOW.Y_I0-12} markerEnd="url(#arrow)" />
+                                <line x1={FLOW.X_C1} y1={FLOW.Y_I0+12} x2={FLOW.X_C1} y2={FLOW.Y_CHECK_I-20} markerEnd="url(#arrow)" />
+                                <polyline points={`${FLOW.X_C1-20},${FLOW.Y_CHECK_I} ${FLOW.X_C1-60},${FLOW.Y_CHECK_I} ${FLOW.X_C1-60},${FLOW.Y_END} ${FLOW.X_C1-30},${FLOW.Y_END}`} markerEnd="url(#arrow)" />
+                                <polyline points={`${FLOW.X_C1+20},${FLOW.Y_CHECK_I} ${FLOW.X_C2},${FLOW.Y_CHECK_I} ${FLOW.X_C2},${FLOW.Y_J_INIT-12}`} markerEnd="url(#arrow)" />
+                                <line x1={FLOW.X_C2} y1={FLOW.Y_J_INIT+12} x2={FLOW.X_C2} y2={FLOW.Y_CHECK_J-20} markerEnd="url(#arrow)" />
+                                <polyline points={`${FLOW.X_C2-20},${FLOW.Y_CHECK_J} ${FLOW.X_C1},${FLOW.Y_CHECK_J} ${FLOW.X_C1},${FLOW.Y_I_INC-12}`} markerEnd="url(#arrow)" />
+                                <polyline points={`${FLOW.X_C2+20},${FLOW.Y_CHECK_J} ${FLOW.X_C3},${FLOW.Y_CHECK_J} ${FLOW.X_C3},${FLOW.Y_COMPARE-20}`} markerEnd="url(#arrow)" />
+                                <line x1={FLOW.X_C3} y1={FLOW.Y_COMPARE+20} x2={FLOW.X_C3} y2={FLOW.Y_MERGE_SWAP} stroke="white" />
+                                <polyline points={`${FLOW.X_C3+20},${FLOW.Y_COMPARE} ${FLOW.X_C4},${FLOW.Y_COMPARE} ${FLOW.X_C4},${FLOW.Y_SWAP1-12}`} markerEnd="url(#arrow)" />
+                                <line x1={FLOW.X_C4} y1={FLOW.Y_SWAP1+12} x2={FLOW.X_C4} y2={FLOW.Y_SWAP2-12} markerEnd="url(#arrow)" />
+                                <line x1={FLOW.X_C4} y1={FLOW.Y_SWAP2+12} x2={FLOW.X_C4} y2={FLOW.Y_SWAP3-12} markerEnd="url(#arrow)" />
+                                <polyline points={`${FLOW.X_C4},${FLOW.Y_SWAP3+12} ${FLOW.X_C4},${FLOW.Y_MERGE_SWAP} ${FLOW.X_C2},${FLOW.Y_MERGE_SWAP}`} />
+                                <line x1={FLOW.X_C2} y1={FLOW.Y_MERGE_SWAP} x2={FLOW.X_C2} y2={FLOW.Y_J_INC-12} markerEnd="url(#arrow)" />
+                                <polyline points={`${FLOW.X_C2},${FLOW.Y_J_INC+12} ${FLOW.X_C2},${FLOW.Y_J_INC+30} ${FLOW.X_C1},${FLOW.Y_J_INC+30} ${FLOW.X_C1},${FLOW.Y_I_INC-12}`} markerEnd="url(#arrow)" />
+                                <line x1={FLOW.X_C1} y1={FLOW.Y_I_INC+12} x2={FLOW.X_C1} y2={FLOW.Y_END-15} markerEnd="url(#arrow)" />
                             </g>
                         </svg>
 
-                        <div className={`shape-oval font-black text-sm ${nodeClass}`} style={{ left: X_C1, top: Y_START, transform: 'translate(-50%, -50%)' }}>Start</div>
-                        <div className={`shape-oval font-black text-sm ${nodeClass}`} style={{ left: X_C1, top: Y_END, transform: 'translate(-50%, -50%)' }}>End</div>
+                        <div className={`shape-oval font-black text-sm ${nodeClass}`} style={{ left: FLOW.X_C1, top: FLOW.Y_START, transform: 'translate(-50%, -50%)' }}>Start</div>
+                        <div className={`shape-oval font-black text-sm ${nodeClass}`} style={{ left: FLOW.X_C1, top: FLOW.Y_END, transform: 'translate(-50%, -50%)' }}>End</div>
 
-                        <div className={`shape-para ${nodeClass}`} style={{ left: X_C1, top: Y_IN_ARR, transform: 'translate(-50%, -50%)' }}><span className="text-[9px]">Input arr</span></div>
-                        <div className={`shape-para ${nodeClass}`} style={{ left: X_C1, top: Y_IN_N, transform: 'translate(-50%, -50%)' }}><span className="text-[9px]">Input n</span></div>
-                        <div className={`shape-rect ${nodeClass}`} style={{ left: X_C1, top: Y_I0, transform: 'translate(-50%, -50%)' }}><span className="text-[9px]">i = 0</span></div>
-                        <div className={`shape-rect ${nodeClass}`} style={{ left: X_C1, top: Y_I_INC, transform: 'translate(-50%, -50%)' }}><span className="text-[9px]">i=i+1</span></div>
-                        <div className={`shape-rect ${nodeClass}`} style={{ left: X_C2, top: Y_J_INIT, transform: 'translate(-50%, -50%)' }}><span className="text-[9px]">j = i + 1</span></div>
-                        <div className={`shape-rect ${nodeClass}`} style={{ left: X_C2, top: Y_J_INC, transform: 'translate(-50%, -50%)' }}><span className="text-[9px]">j=j+1</span></div>
-                        <div className={`shape-rect ${nodeClass}`} style={{ left: X_C4, top: Y_SWAP1, transform: 'translate(-50%, -50%)' }}><span className="text-[9px]">t=arr[i]</span></div>
-                        <div className={`shape-rect ${nodeClass}`} style={{ left: X_C4, top: Y_SWAP2, transform: 'translate(-50%, -50%)' }}><span className="text-[9px]">arr[i]=arr[j]</span></div>
-                        <div className={`shape-rect ${nodeClass}`} style={{ left: X_C4, top: Y_SWAP3, transform: 'translate(-50%, -50%)' }}><span className="text-[9px]">arr[j]=t</span></div>
+                        <div className={`shape-para ${nodeClass}`} style={{ left: FLOW.X_C1, top: FLOW.Y_IN_ARR, transform: 'translate(-50%, -50%)' }}><span className="text-[9px]">Input arr</span></div>
+                        <div className={`shape-para ${nodeClass}`} style={{ left: FLOW.X_C1, top: FLOW.Y_IN_N, transform: 'translate(-50%, -50%)' }}><span className="text-[9px]">Input n</span></div>
+                        <div className={`shape-rect ${nodeClass}`} style={{ left: FLOW.X_C1, top: FLOW.Y_I0, transform: 'translate(-50%, -50%)' }}><span className="text-[9px]">i = 0</span></div>
+                        <div className={`shape-rect ${nodeClass}`} style={{ left: FLOW.X_C1, top: FLOW.Y_I_INC, transform: 'translate(-50%, -50%)' }}><span className="text-[9px]">i=i+1</span></div>
+                        <div className={`shape-rect ${nodeClass}`} style={{ left: FLOW.X_C2, top: FLOW.Y_J_INIT, transform: 'translate(-50%, -50%)' }}><span className="text-[9px]">j = i + 1</span></div>
+                        <div className={`shape-rect ${nodeClass}`} style={{ left: FLOW.X_C2, top: FLOW.Y_J_INC, transform: 'translate(-50%, -50%)' }}><span className="text-[9px]">j=j+1</span></div>
+                        <div className={`shape-rect ${nodeClass}`} style={{ left: FLOW.X_C4, top: FLOW.Y_SWAP1, transform: 'translate(-50%, -50%)' }}><span className="text-[9px]">t=arr[i]</span></div>
+                        <div className={`shape-rect ${nodeClass}`} style={{ left: FLOW.X_C4, top: FLOW.Y_SWAP2, transform: 'translate(-50%, -50%)' }}><span className="text-[9px]">arr[i]=arr[j]</span></div>
+                        <div className={`shape-rect ${nodeClass}`} style={{ left: FLOW.X_C4, top: FLOW.Y_SWAP3, transform: 'translate(-50%, -50%)' }}><span className="text-[9px]">arr[j]=t</span></div>
 
                         {/* DIAMONDS XOAY TRÁI, LABEL TRẮNG */}
-                        <div className={`shape-diamond ${nodeClass}`} style={{ left: X_C1, top: Y_CHECK_I, transform: 'translate(-50%, -50%) rotate(-45deg)' }}>
+                        <div className={`shape-diamond ${nodeClass}`} style={{ left: FLOW.X_C1, top: FLOW.Y_CHECK_I, transform: 'translate(-50%, -50%) rotate(-45deg)' }}>
                              <span className="text-[10px] w-[150%] text-center block" style={{ transform: 'rotate(45deg)' }}>i &lt; n-1</span>
                         </div>
-                        <div className="absolute text-[8px] text-white font-bold" style={{ left: X_C1 + 35, top: Y_CHECK_I - 12 }}>TRUE</div>
-                        <div className="absolute text-[8px] text-white font-bold" style={{ left: X_C1 - 55, top: Y_CHECK_I - 12 }}>FALSE</div>
+                        <div className="absolute text-[8px] text-white font-bold" style={{ left: FLOW.X_C1 + 35, top: FLOW.Y_CHECK_I - 12 }}>TRUE</div>
+                        <div className="absolute text-[8px] text-white font-bold" style={{ left: FLOW.X_C1 - 55, top: FLOW.Y_CHECK_I - 12 }}>FALSE</div>
 
-                        <div className={`shape-diamond ${nodeClass}`} style={{ left: X_C2, top: Y_CHECK_J, transform: 'translate(-50%, -50%) rotate(-45deg)' }}>
+                        <div className={`shape-diamond ${nodeClass}`} style={{ left: FLOW.X_C2, top: FLOW.Y_CHECK_J, transform: 'translate(-50%, -50%) rotate(-45deg)' }}>
                              <span className="text-[10px] w-[150%] text-center block" style={{ transform: 'rotate(45deg)' }}>j &lt; n</span>
                         </div>
-                        <div className="absolute text-[8px] text-white font-bold" style={{ left: X_C2 + 35, top: Y_CHECK_J - 12 }}>TRUE</div>
-                        <div className="absolute text-[8px] text-white font-bold" style={{ left: X_C2 - 55, top: Y_CHECK_J - 12 }}>FALSE</div>
+                        <div className="absolute text-[8px] text-white font-bold" style={{ left: FLOW.X_C2 + 35, top: FLOW.Y_CHECK_J - 12 }}>TRUE</div>
+                        <div className="absolute text-[8px] text-white font-bold" style={{ left: FLOW.X_C2 - 55, top: FLOW.Y_CHECK_J - 12 }}>FALSE</div>
 
-                        <div className={`shape-diamond ${nodeClass}`} style={{ left: X_C3, top: Y_COMPARE, transform: 'translate(-50%, -50%) rotate(-45deg)' }}>
+                        <div className={`shape-diamond ${nodeClass}`} style={{ left: FLOW.X_C3, top: FLOW.Y_COMPARE, transform: 'translate(-50%, -50%) rotate(-45deg)' }}>
                              <span className="text-[9px] leading-tight w-[150%] text-center block" style={{ transform: 'rotate(45deg)' }}>arr[j] &lt; arr[i]</span>
                         </div>
-                        <div className="absolute text-[8px] text-white font-bold" style={{ left: X_C3 + 35, top: Y_COMPARE - 12 }}>TRUE</div>
-                        <div className="absolute text-[8px] text-white font-bold" style={{ left: X_C3 - 55, top: Y_COMPARE - 12 }}>FALSE</div>
+                        <div className="absolute text-[8px] text-white font-bold" style={{ left: FLOW.X_C3 + 35, top: FLOW.Y_COMPARE - 12 }}>TRUE</div>
+                        <div className="absolute text-[8px] text-white font-bold" style={{ left: FLOW.X_C3 - 55, top: FLOW.Y_COMPARE - 12 }}>FALSE</div>
 
                     </div>
                 </div>
@@ -192,7 +203,7 @@ const CodeSection = () => {
 
             <div ref={codeRef} className="absolute right-0 top-0 w-[45%] h-full flex items-center justify-end pointer-events-auto will-change-transform">
                  <div className="w-full flex flex-col justify-center">
-                    <CodeCard code={codeString} />
+                    <CodeCard code={CODE_STRING} />
                  </div>
             </div>
          </div>

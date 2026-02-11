@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -33,15 +33,37 @@ const combSortCode = `void CombSort(int[] arr) {
     }
 }`;
 
+const HIGHLIGHT_RULES = [
+  { pattern: /\bvoid\b/g, token: 'text-purple-400' },
+  { pattern: /\bif\b/g, token: 'text-purple-400' },
+  { pattern: /\bfor\b/g, token: 'text-purple-400' },
+  { pattern: /\bwhile\b/g, token: 'text-purple-400' },
+  { pattern: /\bint\b/g, token: 'text-blue-400' },
+  { pattern: /\bdouble\b/g, token: 'text-blue-400' },
+  { pattern: /\bbool\b/g, token: 'text-blue-400' },
+  { pattern: /\btrue\b/g, token: 'text-blue-300' },
+  { pattern: /\bfalse\b/g, token: 'text-blue-300' },
+  { pattern: /1\.3/g, token: 'text-orange-400' },
+  { pattern: /\bSwap\b/g, token: 'text-yellow-300' },
+];
+
 // --- Components ---
 const CodeCard = ({ code }) => {
   const [copied, setCopied] = useState(false);
 
-  const handleCopy = () => {
+  const highlightedCode = useMemo(() => {
+    return HIGHLIGHT_RULES.reduce(
+      (result, { pattern, token }) => result.replace(pattern, `<span class="${token}">$&</span>`),
+      code
+    );
+  }, [code]);
+
+  const handleCopy = useCallback(() => {
+    if (!navigator?.clipboard) return;
     navigator.clipboard.writeText(code);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-  };
+  }, [code]);
 
   return (
     <div className="relative group rounded-lg overflow-hidden border border-white/10 bg-[#0F1115] hover:border-white/30 transition-all duration-500 shadow-2xl mt-4 w-full">
@@ -66,20 +88,7 @@ const CodeCard = ({ code }) => {
 
       <div className="p-4 md:p-6 text-[10px] md:text-xs font-mono-code leading-relaxed overflow-x-auto custom-scrollbar">
         <pre style={{ margin: 0 }}>
-          <code dangerouslySetInnerHTML={{ 
-            __html: code
-              .replace(/void/g, '<span class="text-purple-400">void</span>')
-              .replace(/int/g, '<span class="text-blue-400">int</span>')
-              .replace(/double/g, '<span class="text-blue-400">double</span>')
-              .replace(/bool/g, '<span class="text-blue-400">bool</span>')
-              .replace(/if/g, '<span class="text-purple-400">if</span>')
-              .replace(/for/g, '<span class="text-purple-400">for</span>')
-              .replace(/while/g, '<span class="text-purple-400">while</span>')
-              .replace(/true/g, '<span class="text-blue-300">true</span>')
-              .replace(/false/g, '<span class="text-blue-300">false</span>')
-              .replace(/1.3/g, '<span class="text-orange-400">1.3</span>')
-              .replace(/Swap/g, '<span class="text-yellow-300">Swap</span>')
-          }} />
+          <code dangerouslySetInnerHTML={{ __html: highlightedCode }} />
         </pre>
       </div>
     </div>

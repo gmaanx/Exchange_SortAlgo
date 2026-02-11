@@ -1,9 +1,18 @@
 import React, { useState, useRef } from 'react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 const Simulation = () => {
   const containerRef = useRef(null);
+  const visualizePanelRef = useRef(null);
+  const blocksWrapRef = useRef(null);
+  const controlsRef = useRef(null);
+  const textPanelRef = useRef(null);
+  const titleRef = useRef(null);
+  const stepsRef = useRef(null);
   const DATA_SETS = {
     average: [15, 8, 10, 2, 5, 1],
     best: [1, 2, 5, 8, 10, 15],
@@ -16,6 +25,28 @@ const Simulation = () => {
   const blockRefs = useRef([]);
 
   const { contextSafe } = useGSAP({ scope: containerRef });
+
+  useGSAP(() => {
+    const steps = stepsRef.current ? Array.from(stepsRef.current.querySelectorAll('p')) : [];
+
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: containerRef.current,
+        start: 'top 78%',
+        once: true,
+      },
+      defaults: {
+        ease: 'power3.out',
+      },
+    });
+
+    tl.from(titleRef.current, { y: 38, autoAlpha: 0, duration: 0.7 })
+      .from(visualizePanelRef.current, { y: 34, autoAlpha: 0, duration: 0.7 }, '<')
+      .from(blocksWrapRef.current, { y: 26, autoAlpha: 0, duration: 0.55 }, '<')
+      .from(blockRefs.current, { y: 22, autoAlpha: 0, duration: 0.45, stagger: 0.07 }, '<+=0.08')
+      .from(controlsRef.current, { y: 22, autoAlpha: 0, duration: 0.5 }, '<')
+      .from(steps, { y: 26, autoAlpha: 0, duration: 0.55, stagger: 0.1 }, '-=0.2');
+  }, { scope: containerRef });
 
   const resetArray = (type) => {
     if (isSorting) return;
@@ -105,11 +136,11 @@ const Simulation = () => {
             Mobile: Nằm dưới (order-2)
             Desktop: Nằm trái (order-1)
         */}
-        <div className="w-full md:w-1/2 flex flex-col items-center justify-center gap-8 md:gap-16 order-2 md:order-1">
+        <div ref={visualizePanelRef} className="w-full md:w-1/2 flex flex-col items-center justify-center gap-8 md:gap-16 order-2 md:order-1">
           
           {/* VISUALIZATION BLOCKS */}
           {/* Mobile: scale nhỏ lại hoặc dùng w-auto */}
-          <div className="relative w-full md:w-[600px] h-32 md:h-40 flex items-center justify-center">
+          <div ref={blocksWrapRef} className="relative w-full md:w-[600px] h-32 md:h-40 flex items-center justify-center">
               <div className="flex gap-2 md:gap-4 relative">
               {array.map((value, index) => {
                   const isPivot = index === activeIndices.i;
@@ -142,7 +173,7 @@ const Simulation = () => {
           </div>
 
           {/* CONTROLS */}
-          <div className="flex flex-col items-center gap-6 w-full px-4 md:px-0">
+          <div ref={controlsRef} className="flex flex-col items-center gap-6 w-full px-4 md:px-0">
               <button 
                   onClick={animateExchangeSort}
                   disabled={isSorting}
@@ -192,12 +223,12 @@ const Simulation = () => {
             Mobile: Nằm trên (order-1)
             Desktop: Nằm phải (order-2)
         */}
-        <div className="w-full md:w-1/2 flex flex-col items-start text-left md:pl-12 z-10 font-inter order-1 md:order-2">
-          <h2 className="text-4xl md:text-6xl font-bold tracking-tighter leading-none text-white mb-6 md:mb-8">
+        <div ref={textPanelRef} className="w-full md:w-1/2 flex flex-col items-start text-left md:pl-12 z-10 font-inter order-1 md:order-2">
+          <h2 ref={titleRef} className="text-4xl md:text-6xl font-bold tracking-tighter leading-none text-white mb-6 md:mb-8">
             Visualize
           </h2>
           
-          <div className="text-sm md:text-base font-normal text-gray-300 space-y-3 md:space-y-4 leading-relaxed tracking-wide">
+          <div ref={stepsRef} className="text-sm md:text-base font-normal text-gray-300 space-y-3 md:space-y-4 leading-relaxed tracking-wide">
               <p><span className="text-white font-semibold">Bước 1:</span> Khởi tạo i = 0.</p>
               
               <p><span className="text-white font-semibold">Bước 2:</span> Nếu i &lt; N - 1 thì thực hiện Bước 3,<br className="hidden md:block"/> ngược lại kết thúc.</p>

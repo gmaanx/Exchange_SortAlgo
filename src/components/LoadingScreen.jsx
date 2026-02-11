@@ -16,18 +16,18 @@ const LoadingScreen = ({ onLoadingComplete }) => {
     // Loader hiện lên từ từ
     tl.to(loaderRef.current, {
       opacity: 1,
-      duration: 0.5,
+      duration: 0.35,
     });
 
     // --- 2. CHỜ ---
-    // Giữ màn hình loading trong 2.5s để người dùng kịp nhìn thấy hiệu ứng
-    tl.to({}, { duration: 2.5 }); 
+    // Giữ màn hình loading ngắn hơn để vào trang nhanh hơn
+    tl.to({}, { duration: 1.1 }); 
 
     // --- 3. BIẾN MẤT (Fade Out) ---
     // Cả màn hình mờ dần rồi biến mất
     tl.to(containerRef.current, {
       opacity: 0,
-      duration: 0.8,
+      duration: 0.45,
       ease: "power2.inOut",
     });
     

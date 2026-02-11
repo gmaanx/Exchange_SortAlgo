@@ -1,14 +1,15 @@
-import React from 'react';
+import React, { memo, useCallback } from 'react';
+
+const SIMULATION_SECTION_ID = 'simulation';
+const HERO_VIDEO_SRC = '/hero.mp4';
 
 const Hero = () => {
-  
-  // Hàm xử lý cuộn xuống section Simulation
-  const handleStart = () => {
-    const simulationSection = document.getElementById('simulation');
+  const handleStart = useCallback(() => {
+    const simulationSection = document.getElementById(SIMULATION_SECTION_ID);
     if (simulationSection) {
       simulationSection.scrollIntoView({ behavior: 'smooth' });
     }
-  };
+  }, []);
 
   return (
     <section className="relative w-full h-screen overflow-hidden bg-black text-white font-sans">
@@ -20,8 +21,7 @@ const Hero = () => {
           playsInline 
           className="w-full h-full object-cover opacity-50 scale-105" 
         >
-          {/* Đảm bảo file hero.mp4 nằm trong thư mục public */}
-          <source src="/hero.mp4" type="video/mp4" />
+          <source src={HERO_VIDEO_SRC} type="video/mp4" />
           Your browser does not support the video tag.
         </video>
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
@@ -38,7 +38,6 @@ const Hero = () => {
           </h1>
         </div>
 
-        {/* Đã gắn sự kiện onClick vào đây */}
         <div 
           onClick={handleStart}
           className="absolute bottom-12 left-1/2 -translate-x-1/2 cursor-pointer group"
@@ -52,4 +51,4 @@ const Hero = () => {
   );
 };
 
-export default Hero;
+export default memo(Hero);

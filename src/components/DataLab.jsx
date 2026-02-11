@@ -17,6 +17,10 @@ const sortData = [
   { name: "Quick Sort", time: 2.33, speedup: "~453x", highlight: true },
 ];
 
+const MINT_TEXT = "text-[#6EE7C8]";
+const MINT_BORDER = "border-[#6EE7C8]/70";
+const MINT_BG = "bg-[#6EE7C8]";
+
 const DataLab = () => {
   const containerRef = useRef(null);
   const barsRef = useRef([]);
@@ -86,16 +90,16 @@ const DataLab = () => {
               <div key={index} className="w-full group">
                 {/* Dòng thông tin: Tên + Badge + Số */}
                 <div className="flex justify-between items-center mb-1 text-[10px] md:text-xs leading-none">
-                  <span className="font-bold uppercase tracking-wider text-white">
+                  <span className={`font-bold uppercase tracking-wider ${item.highlight ? MINT_TEXT : "text-white"}`}>
                     {item.name}
                   </span>
                   <div className="text-right flex gap-2 items-center">
-                    <span className="text-white text-[9px] md:text-[10px] font-bold border border-white px-1 py-px rounded inline-block whitespace-nowrap">
+                    <span className={`text-[9px] md:text-[10px] font-bold border px-1 py-px rounded inline-block whitespace-nowrap ${item.highlight ? `${MINT_TEXT} ${MINT_BORDER}` : "text-white border-white"}`}>
                       {item.speedup}
                     </span>
                     <span 
                       ref={el => numbersRef.current[index] = el}
-                      className="font-bold text-white w-24 text-right inline-block whitespace-nowrap"
+                      className={`font-bold w-24 text-right inline-block whitespace-nowrap ${item.highlight ? MINT_TEXT : "text-white"}`}
                     >
                       0.00 ms
                     </span>
@@ -106,7 +110,7 @@ const DataLab = () => {
                 <div className="w-full h-4 md:h-5 bg-white/10 border border-white/20 rounded-sm relative overflow-hidden flex items-center">
                   <div 
                     ref={el => barsRef.current[index] = el}
-                    className="h-full origin-left bg-white"
+                    className={`h-full origin-left ${item.highlight ? MINT_BG : "bg-white"}`}
                     style={{ width: `${widthPercentage}%` }}
                   >
                   </div>

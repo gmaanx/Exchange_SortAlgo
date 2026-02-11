@@ -22,12 +22,17 @@ const RotateOverlay = () => {
   }, { scope: phoneRef });
 
   return (
-    <div className="rotate-overlay fixed inset-0 z-[99999] bg-[#0F1115] flex flex-col items-center justify-center text-white p-6 text-center touch-none">
+    <div className="rotate-overlay fixed inset-0 z-[99999] bg-[#0F1115] flex flex-col items-center justify-center text-white p-6 text-center touch-none font-sans">
       <div className="mb-8 w-16 h-24 border-4 border-white rounded-lg flex items-end justify-center pb-2" ref={phoneRef}>
          <div className="w-1 h-1 bg-white rounded-full"></div>
       </div>
-      <h2 className="text-xl md:text-2xl font-bold uppercase tracking-widest mb-2">Please Rotate Device</h2>
-      <p className="text-sm text-gray-400 font-mono">Xoay ngang điện thoại để có trải nghiệm tốt nhất</p>
+      <h2 className="text-xl md:text-2xl font-semibold uppercase tracking-[0.14em] mb-3">Xoay ngang thiết bị</h2>
+      <p className="text-sm md:text-base text-gray-300 leading-relaxed max-w-[320px]">
+        Xoay ngang để có trải nghiệm tốt hơn.
+      </p>
+      <p className="mt-2 text-xs md:text-sm text-gray-500 leading-relaxed max-w-[340px]">
+        Trải nghiệm tốt nhất khi sử dụng bằng laptop.
+      </p>
 
       <style jsx>{`
         .rotate-overlay {

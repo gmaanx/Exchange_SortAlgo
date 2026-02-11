@@ -1,6 +1,16 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
+
+gsap.registerPlugin(useGSAP);
+
+const MOBILE_BREAKPOINT = 768;
+const NAV_ITEMS = [
+  { id: '01', label: 'Simulation' },
+  { id: '02', label: 'Code' },
+  { id: '03', label: 'Data' },
+  { id: '04', label: 'Evolution' },
+];
 
 const ArrowIcon = ({ className }) => (
   <svg 
@@ -14,7 +24,6 @@ const ArrowIcon = ({ className }) => (
 );
 
 const Navbar = () => {
-  gsap.registerPlugin(useGSAP);
   const containerRef = useRef(null);
   
   const navLinksRef = useRef(null);
@@ -29,18 +38,11 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const navItems = [
-    { id: '01', label: 'Simulation' },
-    { id: '02', label: 'Code' },
-    { id: '03', label: 'Data' },
-    { id: '04', label: 'Evolution' },
-  ];
-
   const { contextSafe } = useGSAP({ scope: containerRef });
 
-  const handleScrollTo = (targetId) => {
+  const handleScrollTo = useCallback((targetId) => {
     if (targetId !== 'home' && targetId !== 'contact') {
-        const item = navItems.find(i => i.label.toLowerCase() === targetId);
+        const item = NAV_ITEMS.find(i => i.label.toLowerCase() === targetId);
         if (item) setActiveTab(item.label);
     } else {
         setActiveTab('');
@@ -56,25 +58,23 @@ const Navbar = () => {
         element.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }
-  };
+  }, [isMenuOpen]);
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 50 && !isScrolled) {
-        setIsScrolled(true);
-      } else if (window.scrollY <= 50 && isScrolled) {
-        setIsScrolled(false);
-      }
+      const nextScrolledState = window.scrollY > 50;
+      setIsScrolled((prev) => (prev === nextScrolledState ? prev : nextScrolledState));
     };
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [isScrolled]);
+  }, []);
 
   useGSAP(() => {
     const tl = gsap.timeline();
 
     // Responsive Logic cho Animation
-    const isMobile = window.innerWidth < 768;
+    const isMobile = window.innerWidth < MOBILE_BREAKPOINT;
 
     if (!isMenuOpen) {
       if (isScrolled) {
@@ -147,7 +147,7 @@ const Navbar = () => {
       // Khi đóng menu:
       // Desktop: Chỉ hiện lại icon menu nếu đã scroll
       // Mobile: Luôn hiện lại icon menu
-      const isMobile = window.innerWidth < 768;
+      const isMobile = window.innerWidth < MOBILE_BREAKPOINT;
       if (isScrolled || isMobile) {
         gsap.to(menuIconRef.current, { autoAlpha: 1, duration: 0.3, delay: 0.2 });
       }
@@ -200,7 +200,7 @@ const Navbar = () => {
           
           {/* NAV LINKS: Ẩn trên Mobile (hidden), Hiện trên Desktop (md:flex) */}
           <div ref={navLinksRef} className="hidden md:flex items-center gap-14 mr-8">
-            {navItems.map((item) => (
+            {NAV_ITEMS.map((item) => (
               <div
                 key={item.id}
                 className="relative cursor-pointer group flex items-start gap-1"
@@ -277,7 +277,7 @@ const Navbar = () => {
               </h1>
             </div>
 
-            {navItems.map((item) => (
+            {NAV_ITEMS.map((item) => (
               <div 
                 key={item.id} 
                 className="group cursor-pointer flex items-center justify-end gap-4 md:gap-6"

@@ -1,4 +1,4 @@
-import React, { useRef, useLayoutEffect } from 'react';
+import React, { useCallback, useLayoutEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -8,6 +8,13 @@ import leafImg from '/contact-leaf.jpg';
 
 gsap.registerPlugin(ScrollTrigger);
 
+const FORM_FIELDS = [
+  { id: 'fullname', label: 'FULL NAME', type: 'text', placeholder: 'Full Name', required: true },
+  { id: 'email', label: 'EMAIL ADDRESS', type: 'email', placeholder: 'email@gmail.com', required: true },
+  { id: 'phone', label: 'PHONE NUMBER', type: 'tel', placeholder: '(+84) 84 848 8686', required: false },
+  { id: 'subject', label: 'SUBJECT', type: 'text', placeholder: 'Subject', required: true },
+];
+
 const ContactSection = () => {
   const containerRef = useRef(null);
   const titleTriggerRef = useRef(null);
@@ -15,10 +22,10 @@ const ContactSection = () => {
   const leftTextRef = useRef(null);
   const rightTextRef = useRef(null);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = useCallback((e) => {
     e.preventDefault();
     alert("Cảm ơn bạn đã liên hệ! (Demo)");
-  };
+  }, []);
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
@@ -88,26 +95,18 @@ const ContactSection = () => {
           {/* Cột phải: Form */}
           <div className="contact-right-col">
             <form className="contact-form" onSubmit={handleSubmit}>
-              
-              <div className="form-group">
-                <label htmlFor="fullname">FULL NAME</label>
-                <input type="text" id="fullname" name="fullname" placeholder="Full Name" required />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="email">EMAIL ADDRESS</label>
-                <input type="email" id="email" name="email" placeholder="email@gmail.com" required />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="phone">PHONE NUMBER</label>
-                <input type="tel" id="phone" name="phone" placeholder="(+84) 84 848 8686" />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="subject">SUBJECT</label>
-                <input type="text" id="subject" name="subject" placeholder="Subject" required />
-              </div>
+              {FORM_FIELDS.map((field) => (
+                <div key={field.id} className="form-group">
+                  <label htmlFor={field.id}>{field.label}</label>
+                  <input
+                    type={field.type}
+                    id={field.id}
+                    name={field.id}
+                    placeholder={field.placeholder}
+                    required={field.required}
+                  />
+                </div>
+              ))}
 
               <div className="form-group">
                 <label htmlFor="message">MESSAGE</label>

@@ -68,9 +68,12 @@ const MarqueeRow = ({ content, direction = 1 }) => {
             {content.map((text, idx) => (
               <React.Fragment key={idx}>
                 <span className="interlude-text-base interlude-word">{text}</span>
-                <span className="interlude-text-base interlude-dot">.</span>
+                {idx < content.length - 1 && (
+                  <span className="interlude-text-base interlude-dot">/</span>
+                )}
               </React.Fragment>
             ))}
+            <span className="interlude-text-base interlude-dot">/</span>
           </div>
         ))}
       </div>
