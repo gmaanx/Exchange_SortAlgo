@@ -1,0 +1,48 @@
+import React, { useRef } from 'react';
+import { gsap } from 'gsap';
+import { useGSAP } from '@gsap/react';
+
+const RotateOverlay = () => {
+  const phoneRef = useRef(null);
+
+  useGSAP(() => {
+    // Animation icon điện thoại xoay ngang nhắc nhở
+    gsap.fromTo(phoneRef.current, 
+      { rotation: 0 },
+      {
+        rotation: 90,
+        duration: 1.5,
+        repeat: -1,
+        repeatDelay: 0.5,
+        yoyo: true,
+        ease: "power2.inOut",
+        transformOrigin: "center center"
+      }
+    );
+  }, { scope: phoneRef });
+
+  return (
+    <div className="rotate-overlay fixed inset-0 z-[99999] bg-[#0F1115] flex flex-col items-center justify-center text-white p-6 text-center touch-none">
+      <div className="mb-8 w-16 h-24 border-4 border-white rounded-lg flex items-end justify-center pb-2" ref={phoneRef}>
+         <div className="w-1 h-1 bg-white rounded-full"></div>
+      </div>
+      <h2 className="text-xl md:text-2xl font-bold uppercase tracking-widest mb-2">Please Rotate Device</h2>
+      <p className="text-sm text-gray-400 font-mono">Xoay ngang điện thoại để có trải nghiệm tốt nhất</p>
+
+      <style jsx>{`
+        .rotate-overlay {
+          display: none; /* Mặc định ẩn trên Desktop */
+        }
+        
+        /* Logic: Chỉ hiện khi màn hình nhỏ (Mobile/Tablet) VÀ đang dọc */
+        @media only screen and (max-width: 1024px) and (orientation: portrait) {
+          .rotate-overlay {
+            display: flex;
+          }
+        }
+      `}</style>
+    </div>
+  );
+};
+
+export default RotateOverlay;

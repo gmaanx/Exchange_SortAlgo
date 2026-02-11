@@ -31,7 +31,10 @@ const Simulation = () => {
 
     let currentArr = [...array];
     const n = currentArr.length;
-    const stepSize = 96; 
+    
+    // Responsive Step Size: Mobile bước nhỏ hơn, Desktop bước lớn hơn
+    const isMobile = window.innerWidth < 768;
+    const stepSize = isMobile ? 56 : 96; // 56px (w-12 + gap-2) vs 96px (w-20 + gap-4)
     const duration = 0.5;
 
     for (let i = 0; i < n - 1; i++) {
@@ -42,8 +45,9 @@ const Simulation = () => {
         const elI = blockRefs.current[i];
         const elJ = blockRefs.current[j];
 
+        // Di chuyển lên (y âm)
         await gsap.to([elI, elJ], {
-          y: -120, 
+          y: isMobile ? -60 : -120, // Mobile nhảy thấp hơn
           duration: 0.4,
           ease: "back.out(1.4)"
         });
@@ -51,7 +55,6 @@ const Simulation = () => {
         await new Promise(r => setTimeout(r, 200));
 
         if (currentArr[i] > currentArr[j]) {
-          
           const distance = (j - i) * stepSize;
 
           await Promise.all([
@@ -93,25 +96,32 @@ const Simulation = () => {
 
       <section 
         ref={containerRef} 
-        className="relative w-full min-h-screen bg-black text-white font-sans flex items-center justify-between px-20 overflow-hidden"
+        // MOBILE: flex-col-reverse (Visualize dưới, Chữ trên), padding nhỏ
+        // DESKTOP: flex-row (Chữ phải, Visualize trái), padding lớn
+        className="relative w-full min-h-screen bg-black text-white font-sans flex flex-col md:flex-row items-center justify-center md:justify-between px-4 md:px-20 py-12 md:py-0 overflow-hidden gap-12 md:gap-0"
       >
         
-        {/* --- LEFT SIDE: SIMULATION & CONTROLS --- */}
-        <div className="w-1/2 flex flex-col items-center justify-center gap-16">
+        {/* --- PART 1: VISUALIZATION & CONTROLS --- 
+            Mobile: Nằm dưới (order-2)
+            Desktop: Nằm trái (order-1)
+        */}
+        <div className="w-full md:w-1/2 flex flex-col items-center justify-center gap-8 md:gap-16 order-2 md:order-1">
           
           {/* VISUALIZATION BLOCKS */}
-          <div className="relative w-[600px] h-40 flex items-center justify-center">
-              <div className="flex gap-4 relative">
+          {/* Mobile: scale nhỏ lại hoặc dùng w-auto */}
+          <div className="relative w-full md:w-[600px] h-32 md:h-40 flex items-center justify-center">
+              <div className="flex gap-2 md:gap-4 relative">
               {array.map((value, index) => {
                   const isPivot = index === activeIndices.i;
                   const isCompare = index === activeIndices.j;
 
-                  let baseClass = "w-20 h-20 flex items-center justify-center text-3xl font-bold border-2 rounded-xl transition-colors duration-200 relative ";
+                  // Mobile: w-12 h-12 text-lg | Desktop: w-20 h-20 text-3xl
+                  let baseClass = "w-12 h-12 md:w-20 md:h-20 flex items-center justify-center text-lg md:text-3xl font-bold border-2 rounded-lg md:rounded-xl transition-colors duration-200 relative ";
                   
                   if (isPivot) {
-                  baseClass += "border-[#BF092F] bg-[#BF092F]/10 text-[#BF092F] shadow-[0_0_40px_rgba(191,9,47,0.4)] z-50 ";
+                  baseClass += "border-[#BF092F] bg-[#BF092F]/10 text-[#BF092F] shadow-[0_0_20px_rgba(191,9,47,0.4)] md:shadow-[0_0_40px_rgba(191,9,47,0.4)] z-50 ";
                   } else if (isCompare) {
-                  baseClass += "border-[#3B9797] bg-[#3B9797]/10 text-[#3B9797] shadow-[0_0_40px_rgba(59,151,151,0.4)] z-50 ";
+                  baseClass += "border-[#3B9797] bg-[#3B9797]/10 text-[#3B9797] shadow-[0_0_20px_rgba(59,151,151,0.4)] md:shadow-[0_0_40px_rgba(59,151,151,0.4)] z-50 ";
                   } else {
                   baseClass += "border-white/20 text-white/50 bg-transparent z-10 ";
                   }
@@ -123,8 +133,8 @@ const Simulation = () => {
                       className={baseClass}
                   >
                       {value}
-                      {isPivot && <span className="absolute -bottom-8 text-[0.6rem] tracking-widest text-[#BF092F] font-bold uppercase">Pivot</span>}
-                      {isCompare && <span className="absolute -bottom-8 text-[0.6rem] tracking-widest text-[#3B9797] font-bold uppercase">Target</span>}
+                      {isPivot && <span className="absolute -bottom-6 md:-bottom-8 text-[0.5rem] md:text-[0.6rem] tracking-widest text-[#BF092F] font-bold uppercase">Pivot</span>}
+                      {isCompare && <span className="absolute -bottom-6 md:-bottom-8 text-[0.5rem] md:text-[0.6rem] tracking-widest text-[#3B9797] font-bold uppercase">Target</span>}
                   </div>
                   );
               })}
@@ -132,19 +142,19 @@ const Simulation = () => {
           </div>
 
           {/* CONTROLS */}
-          <div className="flex flex-col items-center gap-6">
+          <div className="flex flex-col items-center gap-6 w-full px-4 md:px-0">
               <button 
                   onClick={animateExchangeSort}
                   disabled={isSorting}
                   className={`
-                      group relative overflow-hidden px-10 py-4 border transition-all duration-300
+                      group relative overflow-hidden w-full md:w-auto px-8 md:px-10 py-3 md:py-4 border transition-all duration-300
                       ${isSorting 
                           ? 'border-[#BF092F] cursor-not-allowed bg-[#BF092F]/10' 
                           : 'border-white/20 hover:border-white cursor-pointer'
                       }
                   `}
               >
-                  <div className="flex items-center gap-3 z-10 relative">
+                  <div className="flex items-center justify-center gap-3 z-10 relative">
                       {isSorting && (
                           <span className="w-2 h-2 rounded-full bg-[#BF092F] animate-pulse shadow-[0_0_10px_#BF092F]"></span>
                       )}
@@ -157,14 +167,14 @@ const Simulation = () => {
                   )}
               </button>
 
-              <div className="flex gap-8">
+              <div className="flex gap-4 md:gap-8 justify-center w-full">
                   {['Best', 'Average', 'Worst'].map((type) => (
                       <button
                           key={type}
                           onClick={() => resetArray(type.toLowerCase())}
                           disabled={isSorting}
                           className={`
-                              text-[0.65rem] font-bold tracking-widest uppercase transition-all duration-300
+                              text-[0.6rem] md:text-[0.65rem] font-bold tracking-widest uppercase transition-all duration-300 flex-1 md:flex-none text-center
                               ${isSorting 
                                   ? 'opacity-20 cursor-not-allowed' 
                                   : 'opacity-40 hover:opacity-100 hover:text-white cursor-pointer'
@@ -178,21 +188,23 @@ const Simulation = () => {
           </div>
         </div>
 
-        {/* --- RIGHT SIDE: TITLE & PSEUDO-CODE --- */}
-        <div className="w-1/2 flex flex-col items-start text-left pl-12 z-10 font-inter">
-          <h2 className="text-6xl font-bold tracking-tighter leading-none text-white mb-8">
+        {/* --- PART 2: TITLE & PSEUDO-CODE --- 
+            Mobile: Nằm trên (order-1)
+            Desktop: Nằm phải (order-2)
+        */}
+        <div className="w-full md:w-1/2 flex flex-col items-start text-left md:pl-12 z-10 font-inter order-1 md:order-2">
+          <h2 className="text-4xl md:text-6xl font-bold tracking-tighter leading-none text-white mb-6 md:mb-8">
             Visualize
           </h2>
           
-          <div className="text-base font-normal text-gray-300 space-y-4 leading-relaxed tracking-wide">
-              {/* Đã xóa màu custom, dùng text-white để đồng bộ */}
+          <div className="text-sm md:text-base font-normal text-gray-300 space-y-3 md:space-y-4 leading-relaxed tracking-wide">
               <p><span className="text-white font-semibold">Bước 1:</span> Khởi tạo i = 0.</p>
               
-              <p><span className="text-white font-semibold">Bước 2:</span> Nếu i &lt; N - 1 thì thực hiện Bước 3,<br/> ngược lại kết thúc.</p>
+              <p><span className="text-white font-semibold">Bước 2:</span> Nếu i &lt; N - 1 thì thực hiện Bước 3,<br className="hidden md:block"/> ngược lại kết thúc.</p>
               
               <p><span className="text-white font-semibold">Bước 3:</span> Khởi tạo j = i + 1.</p>
               
-              <p><span className="text-white font-semibold">Bước 4:</span> Nếu j &lt; N thì thực hiện Bước 5,<br/> ngược lại tăng i lên 1 và quay về Bước 2.</p>
+              <p><span className="text-white font-semibold">Bước 4:</span> Nếu j &lt; N thì thực hiện Bước 5,<br className="hidden md:block"/> ngược lại tăng i lên 1 và quay về Bước 2.</p>
               
               <p><span className="text-white font-semibold">Bước 5:</span> Nếu A[j] &lt; A[i] thì đổi chỗ A[i] và A[j].</p>
               

@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react'; // Import useState
+import React, { useEffect, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/all';
 import Lenis from 'lenis';
 
 // Import Components
-import LoadingScreen from './components/LoadingScreen.jsx'; // Import LoadingScreen
+import LoadingScreen from './components/LoadingScreen.jsx';
+import RotateOverlay from './components/RotateOverlay.jsx'; // <--- 1. IMPORT COMPONENT NÀY VÀO
 import Navbar from './components/Navbar.jsx';
 import Hero from './components/Hero.jsx'; 
 import Simulation from './components/Simulation.jsx';
@@ -55,17 +56,20 @@ const App = () => {
       gsap.ticker.remove((time) => lenis.raf(time * 1000));
       lenis.destroy();
     };
-  }, [isLoading]); // Thêm isLoading vào dependency array
+  }, [isLoading]);
 
   return (
     <main className="w-full min-h-screen bg-black text-white relative">
       
+      {/* 2. ĐẶT NÓ Ở ĐÂY: Overlay nhắc xoay màn hình sẽ luôn nằm trên cùng (z-index cao nhất) */}
+      <RotateOverlay />
+
       {/* Hiển thị Loading Screen nếu đang load */}
       {isLoading && (
         <LoadingScreen onLoadingComplete={() => setIsLoading(false)} />
       )}
 
-      {/* Nội dung chính (sẽ nằm dưới loading screen) */}
+      {/* Nội dung chính */}
       <Navbar />
       <section id="home">
         <Hero />
