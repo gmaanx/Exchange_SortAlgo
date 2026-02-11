@@ -5,8 +5,8 @@ import { Observer } from 'gsap/all';
 gsap.registerPlugin(Observer);
 
 const CONFIG = {
-  BASE_DURATION: 80,
-  SCROLL_FORCE: 0.15,
+  BASE_DURATION: 70,
+  SCROLL_FORCE: 0.1,
   FRICTION: 0.97,
   TIME_FACTOR: 0.006
 };
