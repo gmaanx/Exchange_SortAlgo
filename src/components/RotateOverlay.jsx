@@ -31,7 +31,7 @@ const RotateOverlay = () => {
         Xoay ngang để có trải nghiệm tốt hơn.
       </p>
       <p className="mt-2 text-xs md:text-sm text-gray-500 leading-relaxed max-w-[340px]">
-        Trải nghiệm tốt nhất khi sử dụng bằng laptop.
+        Trải nghiệm tốt nhất khi sử dụng trên Desktop.
       </p>
 
       <style jsx>{`

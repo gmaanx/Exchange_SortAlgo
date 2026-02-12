@@ -1,60 +1,87 @@
-import React, { useCallback, useLayoutEffect, useRef } from 'react';
+import React, { useRef, useLayoutEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-// IMPORT HÌNH TỪ LOCAL (Thay vì link mạng)
-// Đảm bảo bạn đã bỏ hình vào folder src/assets/
+// Import hình
 import leafImg from '/contact-leaf.jpg'; 
 
 gsap.registerPlugin(ScrollTrigger);
-
-const FORM_FIELDS = [
-  { id: 'fullname', label: 'FULL NAME', type: 'text', placeholder: 'Full Name', required: true },
-  { id: 'email', label: 'EMAIL ADDRESS', type: 'email', placeholder: 'email@gmail.com', required: true },
-  { id: 'phone', label: 'PHONE NUMBER', type: 'tel', placeholder: '(+84) 84 848 8686', required: false },
-  { id: 'subject', label: 'SUBJECT', type: 'text', placeholder: 'Subject', required: true },
-];
 
 const ContactSection = () => {
   const containerRef = useRef(null);
   const titleTriggerRef = useRef(null);
   const imageWrapperRef = useRef(null);
+  const imageRef = useRef(null);
   const leftTextRef = useRef(null);
   const rightTextRef = useRef(null);
 
-  const handleSubmit = useCallback((e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     alert("Cảm ơn bạn đã liên hệ! (Demo)");
-  }, []);
+  };
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      // --- HIỆU ỨNG TÁCH ĐÔI CHỮ ---
+      // 1. Logic Responsive: Mobile hình to hơn (25vw), Desktop nhỏ hơn (12vw)
+      const isMobile = window.innerWidth < 768;
+      const targetWidth = isMobile ? "25vw" : "12vw"; 
+      
+      // Khoảng cách đẩy chữ ra
+      const targetMargin = isMobile ? "0.5rem" : "1.5rem";
+      const spreadX = isMobile ? "5vw" : "3vw";
+
+      gsap.set(imageWrapperRef.current, { width: 0, minWidth: 0, opacity: 0, marginLeft: 0, marginRight: 0 });
+      gsap.set(imageRef.current, { opacity: 1, scale: 1.22, transformOrigin: "center center" });
+      gsap.set([leftTextRef.current, rightTextRef.current], { x: 0 });
+
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: titleTriggerRef.current,
-          start: "top 85%", // Bắt đầu khi mép trên title chạm 85% màn hình
-          end: "top 35%",   // Kết thúc khi nó cuộn lên cao hơn
-          scrub: 1,         // Chuyển động mượt theo cuộn chuột
-          // markers: true, // Bật cái này nếu muốn debug vị trí
+          start: "top 85%",
+          end: "top 35%",
+          scrub: 1,
+          invalidateOnRefresh: true,
         }
       });
 
-      // 1. Lúc đầu hình đang width: 0 (đã set trong CSS) -> Animete mở rộng ra
-      tl.to(imageWrapperRef.current, {
-        width: "12vw",    // Mở rộng ra kích thước mong muốn
-        opacity: 1,       // Hiện hình dần lên
-        marginLeft: "2vw",  // Thêm khoảng cách
-        marginRight: "2vw", // Thêm khoảng cách
-        duration: 1,
-        ease: "power2.out"
-      })
-      // 2. Đồng thời làm chữ sáng lên hoặc rõ hơn (Optional)
+      // --- HIỆU ỨNG ---
+      // Hình ảnh: Từ 0px -> Mở rộng ra
+      tl.fromTo(imageWrapperRef.current, 
+        { 
+          width: "0px", 
+          minWidth: "0px",
+          opacity: 0, 
+          marginLeft: "0px", 
+          marginRight: "0px" 
+        },
+        {
+          width: targetWidth,       
+          minWidth: targetWidth,
+          opacity: 1,               
+          marginLeft: targetMargin, 
+          marginRight: targetMargin,
+          duration: 0.8,
+          ease: "power2.out"
+        }
+      )
+      // Chữ: Từ mờ/khít -> Rõ/thoáng và tản ra 2 bên
       .fromTo([leftTextRef.current, rightTextRef.current], 
-        { letterSpacing: "-0.05em", filter: "blur(2px)" },
-        { letterSpacing: "0em", filter: "blur(0px)", duration: 1 }, 
-        "<" // Chạy cùng lúc với animation trên
+        { 
+          letterSpacing: "-0.05em", 
+          filter: "blur(3px)", 
+          opacity: 0.5 
+        },
+        { 
+          letterSpacing: "0em", 
+          filter: "blur(0px)", 
+          opacity: 1,
+          duration: 0.8
+        }, 
+        "<" // Chạy song song
       );
+      tl.to(leftTextRef.current, { x: `-${spreadX}`, duration: 0.8, ease: "power2.out" }, "<");
+      tl.to(rightTextRef.current, { x: spreadX, duration: 0.8, ease: "power2.out" }, "<");
+      tl.to(imageRef.current, { scale: 1, duration: 0.8, ease: "power2.out" }, "<");
 
     }, containerRef);
 
@@ -66,16 +93,20 @@ const ContactSection = () => {
       <div className="contact-container">
         
         {/* HERO TITLE WRAPPER */}
+        {/* CSS: display: flex; justify-content: center; -> Đảm bảo chữ bắt đầu ở GIỮA */}
         <div className="contact-hero-wrapper" ref={titleTriggerRef}>
+          
           {/* Chữ TRÁI */}
           <span className="hero-text" ref={leftTextRef}>Let's</span>
           
-          {/* HÌNH Ở GIỮA (Lúc đầu width = 0) */}
+          {/* HÌNH Ở GIỮA */}
+          {/* Ban đầu width=0 sẽ biến mất, 2 chữ dính nhau. Khi width tăng -> Đẩy chữ ra */}
           <div className="title-image-wrapper-anim" ref={imageWrapperRef}>
             <img 
               src={leafImg} 
               alt="Leaf Accent" 
-              className="title-image-anim"
+              ref={imageRef}
+              className="title-image-anim" 
             />
           </div>
           
@@ -95,18 +126,26 @@ const ContactSection = () => {
           {/* Cột phải: Form */}
           <div className="contact-right-col">
             <form className="contact-form" onSubmit={handleSubmit}>
-              {FORM_FIELDS.map((field) => (
-                <div key={field.id} className="form-group">
-                  <label htmlFor={field.id}>{field.label}</label>
-                  <input
-                    type={field.type}
-                    id={field.id}
-                    name={field.id}
-                    placeholder={field.placeholder}
-                    required={field.required}
-                  />
-                </div>
-              ))}
+              
+              <div className="form-group">
+                <label htmlFor="fullname">FULL NAME</label>
+                <input type="text" id="fullname" name="fullname" placeholder="Full Name" required />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="email">EMAIL ADDRESS</label>
+                <input type="email" id="email" name="email" placeholder="email@gmail.com" required />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="phone">PHONE NUMBER</label>
+                <input type="tel" id="phone" name="phone" placeholder="(+84) 84 848 8686" />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="subject">SUBJECT</label>
+                <input type="text" id="subject" name="subject" placeholder="Subject" required />
+              </div>
 
               <div className="form-group">
                 <label htmlFor="message">MESSAGE</label>

@@ -404,126 +404,221 @@ body {
 }
 
 
-/* --- CONTACT SECTION STYLES (Mobile Optimized) --- */
+/* =========================================
+   CONTACT SECTION STYLES (UPDATED & ANIMATED)
+========================================= */
+
+/* Container bao quanh chữ và hình */
+.contact-hero-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* QUAN TRỌNG: Căn giữa để 2 chữ dính nhau lúc đầu */
+  width: 100%;
+  margin-bottom: 60px;
+  padding-top: 50px;
+  position: relative;
+}
+
+/* --- CONTACT SECTION --- */
 .contact-section {
   width: 100%;
-  background-color: #000000;
-  color: #ffffff;
-  padding: 60px 20px; /* Mobile: Giảm padding từ 100px xuống 60px */
+  min-height: 100vh;
+  background-color: #050505;
+  color: #fff;
+  padding: 100px 20px;
   font-family: var(--font-inter), sans-serif;
   overflow: hidden;
 }
-@media (min-width: 992px) {
-  .contact-section { padding: 100px 20px; }
-}
 
-.contact-container { max-width: 1400px; margin: 0 auto; }
+.contact-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
 
 .contact-hero-wrapper {
-  display: flex; align-items: center; justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
-  margin-bottom: 60px; /* Mobile reduced */
-  padding-top: 20px; 
+  margin-bottom: 80px;
+  padding-top: 50px;
   position: relative;
-}
-@media (min-width: 992px) {
-  .contact-hero-wrapper { margin-bottom: 100px; padding-top: 50px; }
 }
 
 .hero-text {
-  font-size: 14vw;
-  font-weight: 300; line-height: 1; text-transform: uppercase;
-  color: #ffffff; white-space: nowrap; will-change: transform, letter-spacing, filter;
+  font-size: 15vw;
+  font-weight: 300;
+  line-height: 1;
+  text-transform: uppercase;
+  color: #ffffff;
+  white-space: nowrap;
+  flex: 0 0 auto;
+  will-change: transform, letter-spacing, filter;
   letter-spacing: -0.05em;
 }
 
 .title-image-wrapper-anim {
-  width: 0px; opacity: 0;
-  height: 10vw; /* Chiều cao tương đối theo width màn hình */
-  overflow: hidden; position: relative; margin-left: 0; margin-right: 0;
-  border-radius: 4px; will-change: width, opacity, margin;
+  width: 0px;
+  min-width: 0px;
+  height: 12vw;
+  overflow: hidden;
+  opacity: 0;
+  border-radius: 0;
+  flex: 0 0 auto;
+  position: relative;
+  margin-left: 0;
+  margin-right: 0;
+  will-change: width, opacity, margin;
 }
 
 .title-image-anim {
-  /* MOBILE: Tăng width ảnh lên để nhìn rõ hơn khi chèn giữa chữ */
-  width: 25vw; 
-  height: 100%; object-fit: cover;
-  filter: brightness(0.9) contrast(1.1);
-  transform: scale(1.1);
-}
-@media (min-width: 768px) {
-  .title-image-anim { width: 12vw; } /* Desktop về lại size nhỏ */
+  width: 25vw;
+  height: 100%;
+  object-fit: cover;
 }
 
 .contact-content-grid {
-  display: grid; grid-template-columns: 1fr; gap: 40px; /* Mobile reduced gap */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 50px;
 }
-@media (min-width: 992px) {
-  .contact-content-grid { grid-template-columns: 0.8fr 1.2fr; gap: 120px; align-items: start; }
+
+.contact-content-grid > * {
+  min-width: 0;
+}
+
+.contact-right-col {
+  width: 100%;
+  min-width: 0;
 }
 
 .contact-tag {
-  display: block; font-size: 12px; font-weight: 600; color: #666;
-  margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.05em;
-}
-@media (min-width: 992px) {
-  .contact-tag { font-size: 14px; margin-bottom: 24px; }
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 24px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .contact-headline {
-  font-size: 28px; /* Mobile reduced */
-  font-weight: 500; line-height: 1.3; color: #ededed;
+  font-size: 3rem;
+  line-height: 1.2;
+  margin-top: 20px;
+  color: #e0e0e0;
 }
-@media (min-width: 768px) { .contact-headline { font-size: 36px; } }
-@media (min-width: 992px) { .contact-headline { font-size: 48px; } }
 
-/* FORM STYLES */
-.contact-form { display: flex; flex-direction: column; gap: 20px; }
-@media (min-width: 992px) { .contact-form { gap: 30px; } }
+.contact-form {
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
 
-.form-group { display: flex; flex-direction: column; gap: 8px; }
-@media (min-width: 992px) { .form-group { gap: 12px; } }
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
 
 .form-group label {
-  font-size: 10px; font-weight: 700; text-transform: uppercase; color: #888; letter-spacing: 0.1em;
-}
-@media (min-width: 992px) { .form-group label { font-size: 11px; } }
-
-.form-group input, .form-group textarea {
-  width: 100%; background-color: #0a0a0a; border: 1px solid #333;
-  padding: 14px 16px; /* Mobile reduced padding */
-  font-size: 16px; /* Giữ 16px để iOS không zoom */
-  color: #fff; font-family: inherit; outline: none; border-radius: 0;
-  transition: border-color 0.3s ease, background-color 0.3s ease;
-}
-@media (min-width: 992px) {
-  .form-group input, .form-group textarea { padding: 18px 20px; }
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #888;
+  letter-spacing: 0.1em;
 }
 
-.form-group input:hover, .form-group textarea:hover { border-color: #ffffff; background-color: #111; }
-.form-group input:focus, .form-group textarea:focus { border-color: #ffffff; background-color: #000; }
-.form-group input::placeholder, .form-group textarea::placeholder { color: #444; }
+.form-group input,
+.form-group textarea {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  padding: 15px;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  color: white;
+  margin-top: 8px;
+  transition: border-color 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease;
+}
 
+.form-group input:hover,
+.form-group textarea:hover {
+  border-color: #ffffff;
+  background: #111111;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: #ffffff;
+  background: #0d0d0d;
+  outline: none;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25);
+}
+
+/* Match Start Visualization button hover-fill behavior */
 .contact-submit-btn {
-  width: 100%; padding: 18px; /* Mobile reduced */
-  margin-top: 10px; background-color: #000; color: #fff;
-  border: 1px solid #333; font-size: 12px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.1em;
-  cursor: pointer; position: relative; overflow: hidden;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  padding: 15px 30px;
+  margin-top: 10px;
+  background: transparent;
+  color: #fff;
+  font-weight: 700;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
   transition: border-color 0.3s ease;
 }
-@media (min-width: 992px) {
-  .contact-submit-btn { padding: 22px; margin-top: 20px; font-size: 13px; }
+
+.contact-submit-btn span {
+  position: relative;
+  z-index: 2;
+  transition: color 0.3s ease;
 }
 
 .contact-submit-btn::before {
-  content: ""; position: absolute; bottom: 0; left: 0; width: 100%; height: 0%;
-  background-color: #ffffff; transition: height 0.4s cubic-bezier(0.19, 1, 0.22, 1); z-index: 0;
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 0.3s ease;
+  z-index: 1;
 }
-.contact-submit-btn span { position: relative; z-index: 1; transition: color 0.4s ease; }
-.contact-submit-btn:hover::before { height: 100%; }
-.contact-submit-btn:hover span { color: #000; }
-.contact-submit-btn:hover { border-color: #fff; }
+
+.contact-submit-btn:hover {
+  border-color: #fff;
+}
+
+.contact-submit-btn:hover::before {
+  transform: scaleY(1);
+}
+
+.contact-submit-btn:hover span {
+  color: #000;
+}
+
+@media (max-width: 768px) {
+  .contact-content-grid {
+    grid-template-columns: 1fr;
+  }
+  .hero-text {
+    font-size: 20vw;
+  }
+  .title-image-wrapper-anim {
+    height: 18vw;
+  }
+}
+
+@media (min-width: 768px) {
+  .title-image-anim {
+    width: 12vw;
+  }
+}
 
 
 /* --- UTILS --- */
